@@ -76,7 +76,7 @@ typedef CFHTTPMessageRef (*DMURLResponseGetHTTPResponse)(CFURLRef response);
  Status-Line = HTTP-Version 空格 Status-Code 空格  Reason-Phrase /r/n
  ```
 
-而上面定义的最后一句话 **The client is not required to examine or display the Reason- Phrase** 表示并没有强制要求客户端去解析或是展示 Reason- Phrase 字段，也就是说 Reason- Phrase 这个值是可以不存在的。而用 wireShark 进行网络捉包时，也的确发现了有些 Response 的 Stattus-Line 是没有带上 Reason-Phrase，
+而上面定义的最后一句话 **The client is not required to examine or display the Reason- Phrase** 表示并没有强制要求客户端去解析或是展示 Reason- Phrase 字段，也就是说 Reason- Phrase 这个值是可以不存在的。而用 Wirehark 进行网络捉包时，也的确发现了有些 Response 的 Stattus-Line 是没有带上 Reason-Phrase，
 
 <img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-085923.png?raw=true"   width = "400px" >
 
@@ -477,3 +477,4 @@ totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend;
 另外在 [iOS 性能监控方案 Wedjat](https://www.jianshu.com/p/f244fb25d870) 中提到了去 hook CFNetwork 的 CFReadStreamCreateForHTTPRequest 的方法，返回一个自己的 Proxy 的方式，我尝试了很久，也一直没有成功。通过使用 fishhook 我确定是 hook 到了相关的方法了，但是在使用 NSURLSession 进行网络请求时，并不会调用被我 hook 的方法。当如果是自己去调用  CFReadStreamCreateForHTTPRequest 方法，是会调用 hook 的方法。原因应该是和 fishhook 没办法 hook connect 方法是一致的。
 
 所以在时间统计方法，iOS 9 的手机目前只能获取到 应用层请求开始时间，应用层收到回复时间
+
