@@ -76,13 +76,12 @@ typedef CFHTTPMessageRef (*DMURLResponseGetHTTPResponse)(CFURLRef response);
  Status-Line = HTTP-Version 空格 Status-Code 空格  Reason-Phrase /r/n
  ```
 
-而上面定义的最后一句话 **The client is not required to examine or display the Reason- Phrase** 表示并没有强制要求客户端去解析或是展示 Reason- Phrase 字段，也就是说 Reason- Phrase 这个值是可以不存在的。而用 wireShark 进行网络捉包时，也的确发现了有些 Response 的 Stattus-Line 是没有带上 Reason-Phrase， w：
+而上面定义的最后一句话 **The client is not required to examine or display the Reason- Phrase** 表示并没有强制要求客户端去解析或是展示 Reason- Phrase 字段，也就是说 Reason- Phrase 这个值是可以不存在的。而用 wireShark 进行网络捉包时，也的确发现了有些 Response 的 Stattus-Line 是没有带上 Reason-Phrase，
 
-![带有 Reason-Phrase 的图片](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180713223028634.png)
+<img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-085923.png?raw=true"   width = "400px" >
 
-  
 
-![不带有 Reason-Phrase 的图片](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180713223501088.png)
+<img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-085832.png?raw=true"   width = "400px" >
 
 
 
@@ -127,7 +126,7 @@ typedef CFHTTPMessageRef (*DMURLResponseGetHTTPResponse)(CFURLRef response);
 
 文档中提示到 **The field value MAY be preceded by any amount of LWS, though a single SP is preferred** ，说明了在每一个 filed-value 的开头，有可能有若干个 LWS，也就是所谓的空格，文档中也强调了最好只有一个空格，虽然没有强制要求，但是使用 wireShark 进行捉包时，发现基本上 HTTP/1.1 请求的 field-value 的前面都带有一个空格。如下图所示：
 
-![field-value首部带有一个空格](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180714101216815.png)
+<img src="https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-090015.png?raw=true" width="400px">
 
 另外，在文档的 Message Types 章节中，也对多个 message-header 的格式进行了定义：
 
@@ -183,7 +182,7 @@ Connection: keep-alive\r\nConnect-Type: application/json;charset=UTF-8\r\nData: 
 
 但是，当你高兴的使用上面的方法去计算 Response Headers 的长度时，你会发现无论你怎么计算，获取到的 headers 的长度都会比你在 wireShark 中看到不一致。如下图所示：
 
-![image-20180714104643087](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180714104643087.png)
+<img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-090058.png?raw=true" width = "400px">
 
 点击 wireShark 的每一行 message header 在红色圆圈部分可以看到这个 message header 的长度，将所有 message header 的长度信息加起来（记得将最后一行的 \r\n 的长度也添加进去），计算后得到的长度为（28 + 37 + 46 + 28 + 30 + 2）171，而自己在程序你们计算出来的长度是 172，如下图所示：
 
@@ -193,7 +192,7 @@ Connection: keep-alive\r\nConnect-Type: application/json;charset=UTF-8\r\nData: 
 
 ![image-20180714105959120](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180714105959120.png)
 
-![image-20180714110405904](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180714110405904.png)
+<img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-090340.png?raw=true" width = "400px">
 
 对比可以发现，在 wireShark 中 Transfer-Encoding 的值为 chunked，但是在我们的应用程序中获取到的却是 Identity，为什么会被修改掉笔者找了很久，暂时没有找到比较有效的数据证明，但是猜测应该是苹果在 CFNetwork 层帮我们对收到的数据进行了解码，所以对于 CFNetwork 的上一层来说，body 中的数据其实已经不是 chunked 编码。
 
@@ -327,7 +326,7 @@ trailer 允许用户在消息的尾部添加一些额外的 header 字段。
 
 根据定义，我们采用 wireShare 捉一个 HTTP 的网络包，了解下实际情况和理论是否一致：
 
-![image-20180714171220923](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180714171220923.png)
+<img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-090233.png?raw=true" width = "400px">
 
 可惜的时，在 iOS 中，暂时没有找到获取 chunk 个数 和 chunk 大小的方法，只能简单的将 `-(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data ` 的一次回调，就当做是收到了一次 chunk（这其实是很不准确的，后面会后续会尝试下 hook CFNetwork 的一些方法，看能不能监听到真实的 chunk 信息）。将每次获取到的 data 的大小记录一些，然后在方向根据协议的定义模拟整个编码过程，计算出编码后数据的长度信息。具体代码如下：
 
@@ -427,7 +426,7 @@ trailer 允许用户在消息的尾部添加一些额外的 header 字段。
 
 如果对于流量有比较高的要求，可以自己补上一些经验值。
 
-就 iOS 客户端自己发送的请求， Accept 大部分情况下都是  `*/*` ， 如果没有设置代理，虽然 HTTP/1.1 默认常连接，但是一般在 header 里面还是会设置下 `Connection: keep-alive `，如果设置了代码，那么应该是` Proxy-Connection: keep-alive`。Host 就用 request 中的 Host 就可以了。
+就 iOS 客户端自己发送的请求， Accept 大部分情况下都是  `*/*` ， 如果没有设置代理，虽然 HTTP/1.1 默认常连接，但是一般在 header 里面还是会设置下 `Connection: keep-alive `，如果设置了代理，那么应该是` Proxy-Connection: keep-alive`。Host 就用 request 中的 Host 就可以了。
 
 #### Cookier
 
