@@ -186,12 +186,11 @@ Connection: keep-alive\r\nConnect-Type: application/json;charset=UTF-8\r\nData: 
 
 点击 wireShark 的每一行 message header 在红色圆圈部分可以看到这个 message header 的长度，将所有 message header 的长度信息加起来（记得将最后一行的 \r\n 的长度也添加进去），计算后得到的长度为（28 + 37 + 46 + 28 + 30 + 2）171，而自己在程序你们计算出来的长度是 172，如下图所示：
 
-![image-20180714105220771](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180714105220771.png)
+<img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180717-105427.png?raw=true" width = "400px">
 
 通过对比程序获取到的 Response headers 的数据内容和 wireShark 获取到的 headers 内容，可以发现实际上，这2个 headers 的内容是不一致的:
 
-![image-20180714105959120](/var/folders/k9/83_xv8dj5kn9p4bc7wtfpq_m0000gn/T/abnerworks.Typora/image-20180714105959120.png)
-
+<img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180717-105555.png?raw=true" width = "400px">
 <img src = "https://github.com/zhshijie/ImageSaveWarehouse/blob/master/iOS%20%E6%96%87%E6%A1%A3/iOS%20%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/WX20180716-090340.png?raw=true" width = "400px">
 
 对比可以发现，在 wireShark 中 Transfer-Encoding 的值为 chunked，但是在我们的应用程序中获取到的却是 Identity，为什么会被修改掉笔者找了很久，暂时没有找到比较有效的数据证明，但是猜测应该是苹果在 CFNetwork 层帮我们对收到的数据进行了解码，所以对于 CFNetwork 的上一层来说，body 中的数据其实已经不是 chunked 编码。
